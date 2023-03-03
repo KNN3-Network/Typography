@@ -1,0 +1,9 @@
+from python:3.8
+ENV LANG C.UTF-8
+ENV ENV=dev_in
+COPY . .
+RUN pip install -r content/projects/aicreation/deploy/requirements.txt
+RUN cp content/projects/aicreation/deploy/hosts /etc/hosts
+CMD python content/projects/aicreation/index.py
+
+

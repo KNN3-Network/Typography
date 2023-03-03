@@ -1,0 +1,9 @@
+boto3
+openai
+numpy
+pandas
+pymysql
+pyyaml
+flask
+kafka-python
+

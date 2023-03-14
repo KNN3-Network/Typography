@@ -7,6 +7,7 @@ import json
 urls = cfg.urls
 def default_callback(data):
     print(data)
+
 class Producer():
 
     def __init__(self):
@@ -16,11 +17,12 @@ class Producer():
 
     def send(self,topic,data):
         self.producer.send(topic,value=data)  # 向分区1发送消息
+
         # try:
-        #     future.get(timeout=10)  # 监控是否发送成功
+        #     result = future.get(timeout=10)  # 监控是否发送成功
+        #     print(result.topic, result.partition, result.offset)
         # except kafka_errors:  # 发送失败抛出kafka_errors
         #     traceback.format_exc()
-
 
 class Consumer():
 

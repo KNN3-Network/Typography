@@ -1,23 +1,21 @@
 import sys
 import os
-import pandas as pd
 DIR = os.path.dirname(os.path.abspath(__file__))
 DIR = os.path.dirname(DIR)
 DIR = os.path.dirname(DIR)
 sys.path.append(DIR)
-
-
+import pandas as pd
 import pymysql
 from content.configs.global_configs import MysqlConfigs as mc
 
 class MYSQL():
 
-    def __init__(self):
+    def __init__(self,db):
         self.conn = pymysql.connect(host=mc.host,
                                     port=int(mc.port),
                                     user=mc.user,
                                     password=mc.pwd,
-                                    db=mc.db)
+                                    db=db)
         self.curr = self.conn.cursor()
 
 
@@ -80,6 +78,25 @@ class MYSQL():
         sql = sql_start + value_str
         return sql,data
 
+    @staticmethod
+    def generate_insert_sql_and_data_batch(table_name:str,batch_params:list):
+        datas = []
+        sql_start = "INSERT INTO `{}` ( ".format(table_name)
+        value_str = "VALUES ( "
+        order_key = []
+        for key in batch_params[0]:
+            sql_start += '`{}`'.format(key)
+            sql_start += ','
+            value_str += '%s'
+            value_str += ','
+            order_key.append(key)
+        sql_start = sql_start[:-1] + ') '
+        value_str = value_str[:-1] + ')'
+        sql = sql_start + value_str
+        for p in batch_params:
+            datas.append([p[key] for key in order_key])
+        return sql,datas
+
     def search(self,sql):
         a =  self.curr.execute(sql)
         data = self.curr.fetchall()
@@ -87,6 +104,10 @@ class MYSQL():
 
     def execute(self,sql_template,data):
         self.curr.execute(sql_template,data)
+        self.conn.commit()
+
+    def insert(self,sql_template, data):
+        self.curr.execute(sql_template, data)
         self.conn.commit()
 
     def insert_batch(self,sql_template,data):
@@ -106,8 +127,8 @@ class MYSQL():
 
 class PandasDB():
 
-    def __init__(self):
-        self.mysql = MYSQL()
+    def __init__(self,db):
+        self.mysql = MYSQL(db)
 
     def read_sql(self,sql):
         return pd.read_sql(sql,self.mysql.conn)
@@ -117,7 +138,7 @@ class PandasDB():
 
 if __name__ == '__main__':
     mysql = MYSQL()
-    sql = "INSERT INTO `polygon_lens_hot_words_score` (`profileid`,`pubid`,`word`,`count`,`rank`,`type`) VALUES (%s, %s, %s, %s, %s, %s)"
+    #sql = "INSERT INTO `polygon_lens_hot_words_score` (`profileid`,`pubid`,`word`,`count`,`rank`,`type`) VALUES (%s, %s, %s, %s, %s, %s)"
     sql = 'SELECT word FROM `polygon_lens_hot_words_score` WHERE id = 4370164'
     a=mysql.search(sql)
     print(a)

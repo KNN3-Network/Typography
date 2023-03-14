@@ -35,7 +35,7 @@ class S3Conn():
         url = self.end_point + '/' + bucket_name +'/' + filename
         return url
 
-    def put_data(self, bucket_name, filename, data,content_type):
+    def put_data(self, bucket_name, filename, data, content_type):
         return self.conn.put_object(
             Bucket=bucket_name,
             Body=data,

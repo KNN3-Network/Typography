@@ -8,7 +8,6 @@ def get_int(s,defalt):
     return int(s) if s is not None and s!='' else defalt
 
 def get_braces_as_json(s):
-    print(s)
     s=s.replace('\n','')
     result = re.findall(r"\{(.+?)\}",s.strip())
     if len(result)>0:
